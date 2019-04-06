@@ -6,8 +6,7 @@ This module offers a simple solution to the anime hoarding weebs in the world li
 
 1. Run `pip install -r requirements.txt` to install all dependencies. 
 2. Run `python downloader.py <9ANIME_SERIES_URL>"` for direct download or `"python downloader.py <SERIES_NAME> -s"` to search for series.
-Example series URL: "https://ww.9animes.net/one-punch-man-english-subbed/"
-Example series name: "One Punch Man"
+3. Example series URL: "https://ww.9animes.net/one-punch-man-english-subbed/", example series name: "One Punch Man".
 
 ## Requirements
 
