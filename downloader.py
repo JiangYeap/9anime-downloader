@@ -126,8 +126,8 @@ def select_eps(num_eps, default=False):
 def select_quality(default=False):
     if default:
         return '720'
-    quality = input('Select video quality (720/480): ')
-    if quality not in ['720', '480']:
+    quality = input('Select video quality (1080/720/480): ')
+    if quality not in ['1080', '720', '480']:
         print('Invalid input. Please try again.')
         quality = select_quality()
     return quality
