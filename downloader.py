@@ -1,4 +1,6 @@
-from __future__ import print_function
+# -*- coding: utf-8 -*-
+
+from __future__ import print_function, unicode_literals
 from builtins import input
 import sys, re, os
 from lxml.html import fromstring
@@ -16,11 +18,7 @@ except ImportError:
 
 SRC_REGEX = re.compile('https://www.rapidvideo.com/e/[^"\']*')
 RANGE_REGEX = re.compile('(\d+)\s*-\s*(\d+)$')
-
-if _has_cfscrape:
-    scraper = cfscrape.create_scraper()
-else:
-    scraper = requests
+SPECIAL_CHAR_REGEX = re.compile('[:\\/?"<>|*]')
 
 
 def download(series_url, default=False):
@@ -45,6 +43,7 @@ def get_series_data(series_url):
     for ep_entry in series_page.xpath('//li[contains(@class, "hentry")]/div[1]/a'):
         ep_url = ep_entry.xpath('./@href')[0].strip()
         ep_name = ep_entry.xpath('./@title')[0].strip()
+        ep_name = re.sub(SPECIAL_CHAR_REGEX, '-', ep_name)
         ep_urls.append(urljoin(series_url, ep_url))
         ep_names.append('%s.mp4' % ep_name)
     ep_urls = ep_urls[::-1]
@@ -58,12 +57,12 @@ def get_series_data(series_url):
 
 def create_dir(title, default):
     if default:
-        dir_name = title
+        dir_name = re.sub(SPECIAL_CHAR_REGEX, '-', title)
     else:
         dir_name = input('\nEnter download folder name or leave empty to use ' +
                 'default title. It will be created in the current directory: ')
         if not dir_name:
-            dir_name = title
+            dir_name = re.sub(SPECIAL_CHAR_REGEX, '-', title)
     dir_root = os.getcwd()
     dir_path = dir_root + '\\' + dir_name + '\\'
     if not os.path.exists(dir_path): 
@@ -180,20 +179,28 @@ def select_series(num_series):
     return series_index
 
 
+def print_help():
+    print('Usage: "python downloader.py <9ANIME_SERIES_URL>" or "python ' +
+            'downloader.py -s <SERIES_NAME>" to search for series.')
+
+
 if __name__ == '__main__':
+    global scraper
+    scraper = cfscrape.create_scraper() if _has_cfscrape else requests
     if len(sys.argv) == 2:
         series_url = sys.argv[1]
         download(series_url)
     elif len(sys.argv) == 3:
-        if sys.argv[2] == '-d':
-            series_url = sys.argv[1]
+        if sys.argv[1] == '-d':
+            series_url = sys.argv[2]
             download(series_url, True)
-        elif sys.argv[2] == '-s':
-            series_urls, series_titles, num_series = query_series(sys.argv[1])
+        elif sys.argv[1] == '-s':
+            series_urls, series_titles, num_series = query_series(sys.argv[2])
             print_series_list(series_titles)
             series_index = select_series(num_series)
             download(series_urls[series_index])
+        else:
+            print_help()
     else:
-        print('Usage: "python downloader.py <9ANIME_SERIES_URL>" or "python ' +
-            'downloader.py <SERIES_NAME> -s" to search for series.')
+        print_help()
     sys.exit()
