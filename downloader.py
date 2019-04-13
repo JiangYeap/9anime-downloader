@@ -133,15 +133,15 @@ def select_quality(default=False):
 
 
 def query_series(title_query):
-    query_url = 'https://ww.9animes.net/page/%d/?s=%s'
+    query_url = 'https://ww1.9animes.net/page/%d/?s=%s'
     page_num = 1
     series_urls = []
     series_titles = []
     while True:
         search_str = scraper.get(query_url % (page_num, title_query)).content.decode('utf-8')
-        page_num += 1
-        if '404' in search_str:
+        if 'Error 404' in search_str:
             break
+        page_num += 1
         search_page = fromstring(search_str)
         for series in search_page.xpath('//span[@class="meta-category"]/a'):
             series_url = series.xpath('./@href')[0].strip()
